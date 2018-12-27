@@ -1,0 +1,26 @@
+{
+  "name": "pc-idle-guard",
+  "version": "0.1.0",
+  "description": "Stop party guests from messing with your computer",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "start-on-windows": "set ELECTRON_ENABLE_LOGGING=1&&npm start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.5.3",
+    "electron": "^4.0.0",
+    "nconf": "^0.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.11.0",
+    "eslint-config-prettier": "^3.3.0",
+    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "prettier": "^1.15.3"
+  }
+}

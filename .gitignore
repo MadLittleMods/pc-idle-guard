@@ -1,0 +1,4 @@
+node_modules/
+
+config/config.user-overrides.json
+config/config.*.user-overrides.json
