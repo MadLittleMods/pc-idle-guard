@@ -1,6 +1,6 @@
 # PC Idle Guard
 
-Stop party guests from messing with your computer by locking/unlocked mouse usage via keyboard shortcut
+Stop party guests from messing with your computer by locking/unlocked mouse usage via keyboard shortcut. Not always feasible to use the OS lock feature because you want the movie to continue playing while you go to the bathroom.
 
 Behind the scenes, it just disables the mouse device. If you get in trouble, you can re-enable via Device Manager
 
@@ -23,10 +23,13 @@ The syntax for shortcuts is [Electron accelerator](https://electronjs.org/docs/a
 ## Future plans
 
  - Run in background with tray icon indicating lock state
+    - Don't allow easy exiting while in locked state
  - Keep a log of keyboard activity while locked
  - Add some sound-effects when the keyboard is used while locked (like sticky keys)
  - Disable Chrome autofill when locked
     - Perhaps a companion Chrome extension that adds `autofill="off"` to everything
+ - Lock/Unlock with password
+    - Shortcut brings up a little dialog in the corner to type in password
 
 
 ## Random notes
