@@ -4,8 +4,9 @@ Stop party guests from messing with your computer by locking/unlocking mouse usa
 
  - When locked: Disable mouse
     - Behind the scenes, it just disables the mouse device. If you get in trouble, you can re-enable via Device Manager
- - When locked: Play a clicking noise whenever a keyboard key is pressed
- - When locked: OS-lock your computer after 5(default, configurable) keystrokes have happened
+ - When locked: Play a clicking sound whenever a keyboard key is pressed
+ - When locked: OS-lock your computer after 5(default, configurable) keystrokes have occurred
+ - When locked: Plays quick alarm/siren if the process is exited
 
 **NB:** Only compatible with Windows and tested on Windows 10
 
@@ -51,4 +52,5 @@ See https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/devcon-exa
 ## Attribution
 
  - `click.mp3` sound from https://opengameart.org/content/zippo-click-sound
- - `lock`/`unlock` sounds from https://midi.city/ (picked bass)
+ - `lock.mp3`/`unlock.mp3` sounds from https://midi.city/ (picked bass)
+ - `siren.mp3` from https://opengameart.org/content/sirens-and-alarm-noise

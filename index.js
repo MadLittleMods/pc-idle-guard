@@ -5,14 +5,33 @@ const osLock = require('./lib/os-lock');
 const toggleMouse = require('./lib/toggle-mouse');
 const keyStringToIohookKeycodeMap = require('./lib/key-string-to-iohook-keycode-map');
 
-/* */
+let currentIsLockedState = false;
+let currentKeyActivitySinceLockedCount = 0;
+
 process.on('unhandledRejection', function(reason, promise) {
   console.error('unhandledRejection', reason);
 });
-/* */
 
-let currentIsLockedState = false;
-let currentKeyActivitySinceLockedCount = 0;
+async function onExit() {
+  try {
+    // Alert when someone is exiting while we are still locked
+    if (currentIsLockedState) {
+      console.warn('Exited PC Idle Guard while still locked');
+
+      // We await here so the sub-process has time to spawn and play before exiting the process
+      await playSound('sounds/siren.mp3');
+    }
+  } finally {
+    process.exit();
+  }
+}
+
+process.on('exit', onExit);
+// Catches Ctrl+c event
+process.on('SIGINT', onExit);
+// Catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', onExit);
+process.on('SIGUSR2', onExit);
 
 async function changeLockState(nextIsLockedState) {
   try {
