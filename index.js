@@ -1,5 +1,6 @@
 const iohook = require('iohook');
 const config = require('./lib/config');
+const logger = require('./lib/log');
 const playSound = require('./lib/play-sound');
 const osLock = require('./lib/os-lock');
 const toggleMouse = require('./lib/toggle-mouse');
@@ -9,14 +10,14 @@ let currentIsLockedState = false;
 let currentKeyActivitySinceLockedCount = 0;
 
 process.on('unhandledRejection', function(reason, promise) {
-  console.error('unhandledRejection', reason);
+  logger.error(`unhandledRejection: ${reason.message} ${reason.stack}`);
 });
 
 async function onExit() {
   try {
     // Alert when someone is exiting while we are still locked
     if (currentIsLockedState) {
-      console.warn('Exited PC Idle Guard while still locked');
+      logger.warn('Exited PC Idle Guard while still locked');
 
       // We await here so the sub-process has time to spawn and play before exiting the process
       await playSound('sounds/siren.mp3');
@@ -35,7 +36,7 @@ process.on('SIGUSR2', onExit);
 
 async function changeLockState(nextIsLockedState) {
   try {
-    console.log(`changeLockState ${nextIsLockedState}`);
+    logger.info(`changeLockState ${nextIsLockedState}`);
 
     // Fire and forget sound
     playSound(nextIsLockedState ? 'sounds/lock.mp3' : 'sounds/unlock.mp3');
@@ -61,7 +62,7 @@ async function registerShortcuts() {
   iohook.registerShortcut(
     lockShortcutKeycodes,
     async () => {
-      console.log(`Lock shortcut triggered`);
+      logger.info(`Lock shortcut triggered`);
 
       await changeLockState(!currentIsLockedState);
     },
@@ -74,9 +75,9 @@ const osLockThreshold = config.get('osLockThreshold');
 
 iohook.start();
 iohook.on('keydown', async event => {
-  //console.log(event);
-
   if (currentIsLockedState) {
+    logger.info(`keydown while locked: ${JSON.stringify(event)}`);
+
     // Keep track of how many keys people are pressing while locked
     currentKeyActivitySinceLockedCount++;
 
@@ -86,7 +87,7 @@ iohook.on('keydown', async event => {
 
   if (osLockThreshold && currentKeyActivitySinceLockedCount >= osLockThreshold) {
     try {
-      console.log(
+      logger.info(
         `Keyboard activity threshold reached (${osLockThreshold}) -> OS-locking computer`
       );
       await osLock();

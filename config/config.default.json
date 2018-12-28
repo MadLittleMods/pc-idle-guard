@@ -1,4 +1,7 @@
 {
   "lockShortcut": "RightAlt+L",
-  "osLockThreshold": 5
+  "osLockThreshold": 5,
+  "logLevel": "info",
+  "fileLogLevel": "debug",
+  "logDir": "./logs"
 }
