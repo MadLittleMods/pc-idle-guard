@@ -9,7 +9,7 @@ const keyStringToIohookKeycodeMap = require('./lib/key-string-to-iohook-keycode-
 let currentIsLockedState = false;
 let currentKeyActivitySinceLockedCount = 0;
 
-process.on('unhandledRejection', function(reason, promise) {
+process.on('unhandledRejection', function(reason /*, promise*/) {
   logger.error(`unhandledRejection: ${reason.message} ${reason.stack}`);
 });
 
@@ -17,10 +17,12 @@ async function onExit() {
   try {
     // Alert when someone is exiting while we are still locked
     if (currentIsLockedState) {
-      logger.warn('Exited PC Idle Guard while still locked');
-
-      // We await here so the sub-process has time to spawn and play before exiting the process
-      await playSound('sounds/siren.mp3');
+      logger.warn('Exited PC Idle Guard while still locked -> OS-locking computer');
+      // We handle this in another process so we can run multiple async stuff consistently
+      // If we just put that code here, only some it could run (mainly for the onExit case)
+      const ChildExecutor = require('./lib/child-executor');
+      const executor = new ChildExecutor();
+      await executor.exec('node panic-exit.js');
     }
   } finally {
     process.exit();
@@ -91,10 +93,8 @@ iohook.on('keydown', async event => {
         `Keyboard activity threshold reached (${osLockThreshold}) -> OS-locking computer`
       );
       await osLock();
-
-      // After OS-locking, we can unlock the lock state
-      // We only want to do this if the OS-locking succeeded
       await changeLockState(false);
+      await playSound('sounds/siren.mp3');
     } catch (err) {
       throw err;
     }

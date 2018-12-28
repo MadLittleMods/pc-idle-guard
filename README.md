@@ -5,8 +5,8 @@ Stop party guests from messing with your computer by locking/unlocking mouse usa
  - When locked: Disable mouse
     - Behind the scenes, it just disables the mouse device. If you get in trouble, you can re-enable via Device Manager
  - When locked: Play a clicking sound whenever a keyboard key is pressed
- - When locked: OS-lock your computer after 5(default, configurable) keystrokes have occurred
- - When locked: Plays quick alarm/siren if the process is exited
+ - When locked: OS-lock your computer and quick siren after 5(default, configurable) keystrokes have occurred
+ - When locked: OS-lock your computer and quick siren if the process is exited
  - When locked: Log activity to file, see `./logs/*` (default, configurable)
 
 **NB:** Only compatible with Windows and tested on Windows 10
@@ -31,7 +31,6 @@ It's best to change the shortcut to something custom so your party guests don't 
 ## Future plans
 
  - Run in background with tray icon indicating lock state
-    - Don't allow easy exiting while in locked state. Use OS lock if an attempt is made to exit when locked
  - Lock/Unlock with password
     - Shortcut brings up a little dialog in the corner to type in password
  - Capture all keyboard events and "`e.preventDefault()`" for everything. Only passthrough lock/unlock shortcut (or password field mentioned in above point)
