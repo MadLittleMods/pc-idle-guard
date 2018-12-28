@@ -92,6 +92,8 @@ iohook.on('keydown', async event => {
       logger.info(
         `Keyboard activity threshold reached (${osLockThreshold}) -> OS-locking computer`
       );
+      // Similar to `panic-exit.js` except the process is still living so
+      // we want to use more of the lifecycle methods that adjust state
       await osLock();
       await changeLockState(false);
       await playSound('sounds/siren.mp3');

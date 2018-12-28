@@ -30,7 +30,7 @@ It's best to change the shortcut to something custom so your party guests don't 
 
 ## Future plans
 
- - Run in background with tray icon indicating lock state
+ - Run in background/service with tray icon indicating lock state
  - Lock/Unlock with password
     - Shortcut brings up a little dialog in the corner to type in password
  - Capture all keyboard events and "`e.preventDefault()`" for everything. Only passthrough lock/unlock shortcut (or password field mentioned in above point)
