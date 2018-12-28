@@ -4,8 +4,7 @@
   "description": "Stop party guests from messing with your computer",
   "main": "index.js",
   "scripts": {
-    "start": "electron .",
-    "start-on-windows": "set ELECTRON_ENABLE_LOGGING=1&&npm start",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.5.3",
-    "electron": "^4.0.0",
+    "iohook": "^0.3.0",
     "nconf": "^0.10.0"
   },
   "devDependencies": {

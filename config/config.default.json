@@ -1,3 +1,4 @@
 {
-  "lockShortcut": "Alt+L"
+  "lockShortcut": "RightAlt+L",
+  "osLockThreshold": 5
 }

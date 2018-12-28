@@ -1,8 +1,9 @@
-const { app, BrowserWindow, globalShortcut } = require('electron');
+const iohook = require('iohook');
 const config = require('./lib/config');
-const getDevConPath = require('./lib/get-devcon-path');
-const ChildExecutor = require('./lib/child-executor');
-const RethrownError = require('./lib/rethrown-error');
+const playSound = require('./lib/play-sound');
+const osLock = require('./lib/os-lock');
+const toggleMouse = require('./lib/toggle-mouse');
+const keyStringToIohookKeycodeMap = require('./lib/key-string-to-iohook-keycode-map');
 
 /* */
 process.on('unhandledRejection', function(reason, promise) {
@@ -10,67 +11,19 @@ process.on('unhandledRejection', function(reason, promise) {
 });
 /* */
 
-let win;
 let currentIsLockedState = false;
+let currentKeyActivitySinceLockedCount = 0;
 
-function createWindow() {
-  win = new BrowserWindow({ width: 800, height: 600 });
-
-  win.loadFile('index.html');
-
-  win.webContents.openDevTools();
-
-  // Emitted when the window is closed.
-  win.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    win = null;
-  });
-}
-
-async function checkIfAdmin() {
-  const executor = new ChildExecutor();
+async function changeLockState(nextIsLockedState) {
   try {
-    await executor.exec('NET SESSION');
-    return true;
+    console.log(`changeLockState ${nextIsLockedState}`);
+    await toggleMouse(!nextIsLockedState);
   } catch (err) {
-    return false;
-  }
-}
-
-async function changeLockState(isLocked) {
-  console.log(`changeLockState ${isLocked}`);
-
-  const isAdmin = await checkIfAdmin();
-  if (!isAdmin) {
-    console.warn(
-      `You need administrator privileges to enable/disable devices on Windows. This shortcut probably won't work`
-    );
-  }
-
-  let devConPath;
-  try {
-    devConPath = await getDevConPath();
-  } catch (err) {
-    throw new RethrownError(
-      'DevCon.exe not found, you probably need to download/install it, https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/devcon',
-      err
-    );
-  }
-
-  const actionToExecute = isLocked ? 'disable' : 'enable';
-  const commandToExecute = `"${devConPath}" ${actionToExecute} "HID_DEVICE_SYSTEM_MOUSE"`;
-  console.log('commandToExecute', commandToExecute);
-
-  try {
-    const executor = new ChildExecutor();
-    await executor.exec(commandToExecute);
-  } catch (resultInfo) {
-    throw new RethrownError(
-      `Failed to ${actionToExecute} the mouse, running ${resultInfo.command}`,
-      resultInfo.error
-    );
+    throw err;
+  } finally {
+    // We switch regardless of whether the command above passed in case we are stuck enabled/disabled
+    currentIsLockedState = nextIsLockedState;
+    currentKeyActivitySinceLockedCount = 0;
   }
 }
 
@@ -78,28 +31,50 @@ async function changeLockState(isLocked) {
 async function registerShortcuts() {
   const lockShortcut = config.get('lockShortcut');
 
-  // Syntax for shortcut string, https://electronjs.org/docs/api/accelerator
-  globalShortcut.register(lockShortcut, async () => {
-    console.log(`Lock shortcut ${lockShortcut} triggered`);
+  const lockShortcutKeycodes = lockShortcut
+    .split('+')
+    .map(keyString => keyStringToIohookKeycodeMap[keyString.toLowerCase()]);
 
-    const nextIsLockedState = !currentIsLockedState;
-    await changeLockState(nextIsLockedState);
+  iohook.registerShortcut(
+    lockShortcutKeycodes,
+    async () => {
+      console.log(`Lock shortcut triggered`);
 
-    // We switch regardless of whether the command above passed in case we are stuck enabled/disabled
-    currentIsLockedState = nextIsLockedState;
-  });
+      await changeLockState(!currentIsLockedState);
+    },
+    // FIXME: This empty releaseCallback is needed until https://github.com/wilix-team/iohook/issues/131 is fixed
+    () => {}
+  );
 }
 
-app.on('ready', () => {
-  registerShortcuts();
+const osLockThreshold = config.get('osLockThreshold');
 
-  createWindow();
-});
+iohook.start();
+iohook.on('keydown', async event => {
+  //console.log(event);
 
-app.on('activate', () => {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (win === null) {
-    createWindow();
+  if (currentIsLockedState) {
+    // Keep track of how many keys people are pressing while locked
+    currentKeyActivitySinceLockedCount++;
+
+    // Fire and forget sound
+    playSound('zipclick.mp3');
+  }
+
+  if (osLockThreshold && currentKeyActivitySinceLockedCount >= osLockThreshold) {
+    try {
+      console.log(
+        `Keyboard activity threshold reached (${osLockThreshold}) -> OS-locking computer`
+      );
+      await osLock();
+
+      // After OS-locking, we can unlock the lock state
+      // We only want to do this if the OS-locking succeeded
+      await changeLockState(false);
+    } catch (err) {
+      throw err;
+    }
   }
 });
+
+registerShortcuts();
