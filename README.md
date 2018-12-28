@@ -50,4 +50,5 @@ See https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/devcon-exa
 
 ## Attribution
 
- - `zipclick.mp3` sound from https://opengameart.org/content/zippo-click-sound
+ - `click.mp3` sound from https://opengameart.org/content/zippo-click-sound
+ - `lock`/`unlock` sounds from https://midi.city/ (picked bass)

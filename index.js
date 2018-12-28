@@ -17,6 +17,10 @@ let currentKeyActivitySinceLockedCount = 0;
 async function changeLockState(nextIsLockedState) {
   try {
     console.log(`changeLockState ${nextIsLockedState}`);
+
+    // Fire and forget sound
+    playSound(nextIsLockedState ? 'sounds/lock.mp3' : 'sounds/unlock.mp3');
+
     await toggleMouse(!nextIsLockedState);
   } catch (err) {
     throw err;
@@ -58,7 +62,7 @@ iohook.on('keydown', async event => {
     currentKeyActivitySinceLockedCount++;
 
     // Fire and forget sound
-    playSound('zipclick.mp3');
+    playSound('sounds/click.mp3');
   }
 
   if (osLockThreshold && currentKeyActivitySinceLockedCount >= osLockThreshold) {
