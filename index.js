@@ -61,16 +61,11 @@ async function registerShortcuts() {
     .split('+')
     .map(keyString => keyStringToIohookKeycodeMap[keyString.toLowerCase()]);
 
-  iohook.registerShortcut(
-    lockShortcutKeycodes,
-    async () => {
-      logger.info(`Lock shortcut triggered`);
+  iohook.registerShortcut(lockShortcutKeycodes, async () => {
+    logger.info(`Lock shortcut triggered`);
 
-      await changeLockState(!currentIsLockedState);
-    },
-    // FIXME: This empty releaseCallback is needed until https://github.com/wilix-team/iohook/issues/131 is fixed
-    () => {}
-  );
+    await changeLockState(!currentIsLockedState);
+  });
 }
 
 const osLockThreshold = config.get('osLockThreshold');
