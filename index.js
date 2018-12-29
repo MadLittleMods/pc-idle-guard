@@ -19,7 +19,7 @@ async function onExit() {
     if (currentIsLockedState) {
       logger.warn('Exited PC Idle Guard while still locked -> OS-locking computer');
       // We handle this in another process so we can run multiple async stuff consistently
-      // If we just put that code here, only some it could run (mainly for the onExit case)
+      // If we just put that code here, only some it could run
       const ChildExecutor = require('./lib/child-executor');
       const executor = new ChildExecutor();
       await executor.exec('node panic-exit.js');
@@ -40,10 +40,10 @@ async function changeLockState(nextIsLockedState) {
   try {
     logger.info(`changeLockState ${nextIsLockedState}`);
 
+    await toggleMouse(!nextIsLockedState);
+
     // Fire and forget sound
     playSound(nextIsLockedState ? 'sounds/lock.mp3' : 'sounds/unlock.mp3');
-
-    await toggleMouse(!nextIsLockedState);
   } catch (err) {
     throw err;
   } finally {
@@ -91,7 +91,8 @@ iohook.on('keydown', async event => {
       // we want to use more of the lifecycle methods that adjust state
       await osLock();
       await changeLockState(false);
-      await playSound('sounds/siren.mp3');
+      // Fire and forget sound
+      playSound('sounds/siren.mp3');
     } catch (err) {
       throw err;
     }

@@ -19,6 +19,7 @@ This is not fool-proof, just makes things harder
 
 ## Usage
 
+ 1. This project depends on [VLC media player](https://www.videolan.org/vlc/index.html) for playing sounds (runs a headless command). If you don't care about the sound effects, you can ignore and it should work fine (just some uncaught exceptions).
  1. Install [Node.js](https://nodejs.org/en/)
  1. Clone this project
  1. `npm install`
